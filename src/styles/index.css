@@ -8,3 +8,11 @@
   --color-cream: #FDE4BC;  /* Botones, fondos hero */
   --color-white: #FFF4E2;  /* Fondo general, tarjetas */
 }
+section {
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-white);
+
+}
