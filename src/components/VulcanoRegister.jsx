@@ -8,7 +8,7 @@
 
 import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { registerUser } from "../services/userService";
+import { registerUser } from "../services/api";
 
 const VulcanoRegister = () => {
   const navigate  = useNavigate();
@@ -24,11 +24,12 @@ const VulcanoRegister = () => {
     phoneNumber:     "",
     bio:             "",
     birthDate:       "",
-    profilePictureUrl: "", // se llenará con Base64
   });
 
-  // Vista previa local (Object URL o Base64)
+  // Vista previa local (Object URL)
   const [preview, setPreview] = useState(null);
+  // Archivo real para subir al servidor
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const [error,   setError]   = useState(null);
   const [loading, setLoading] = useState(false);
@@ -62,22 +63,13 @@ const VulcanoRegister = () => {
 
     // Generamos la vista previa rápida (URL de objeto local)
     setPreview(URL.createObjectURL(file));
-
-    // Convertimos a Base64 para enviar al backend
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setFormData((prev) => ({
-        ...prev,
-        profilePictureUrl: ev.target.result, // string "data:image/jpeg;base64,..."
-      }));
-    };
-    reader.readAsDataURL(file);
+    setSelectedFile(file);
   };
 
   // Eliminar imagen seleccionada
   const handleRemoveImage = () => {
     setPreview(null);
-    setFormData((prev) => ({ ...prev, profilePictureUrl: "" }));
+    setSelectedFile(null);
     if (fileRef.current) fileRef.current.value = "";
   };
 
@@ -107,7 +99,7 @@ const VulcanoRegister = () => {
     if (errorMessage) { setError(errorMessage); return; }
     setLoading(true);
     try {
-      await registerUser(formData);
+      await registerUser(formData, selectedFile);
       setSuccess(true);
       setTimeout(() => navigate("/Login"), 2000);
     } catch (err) {

@@ -6,8 +6,8 @@ import Review from "../pages/Review";
 import { Page404 } from "../pages/Page404"
 import ModuleView from "../pages/ModuleView"
 import CoursePage from "../pages/CoursePage"
-// Importamos el Layout al que redirigimos después del login exitoso
-import Layout from "../pages/layout/Layout";
+import UserManagement from "../pages/UserManagement";
+import Dashboard from "../pages/Dashboard";
 
 export const MyRoutes = () => (
     <BrowserRouter>
@@ -18,8 +18,10 @@ export const MyRoutes = () => (
             <Route path="/Course" element={<CoursePage />} />
             <Route path="/ModuleView" element={<ModuleView />} />
             <Route path="/Review" element={<Review />} />
-            {/* Ruta de destino después del login */}
-            <Route path="/layout" element={<Layout />} />
+            <Route path="/Users" element={<UserManagement />} />
+            <Route path="/Dashboard" element={<Dashboard />} />
+            {/* Redirección por defecto para el antiguo /layout */}
+            <Route path="/layout" element={<Dashboard />} />
             <Route path="*" element={<Page404 />} />
         </Routes>
     </BrowserRouter>

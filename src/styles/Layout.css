@@ -88,14 +88,18 @@
   letter-spacing: 0.2px;
 }
 
-/* @username debajo del nombre */
-.sidebar-username {
-  color: var(--color-blush);
-  font-size: 12px;
-  font-weight: 600;
+/* Rol (ADMINISTRADOR / USUARIO) debajo del nombre */
+.sidebar-role {
+  color: var(--color-dark);
+  background-color: var(--color-cream);
+  font-size: 10px;
+  font-weight: 900;
   text-align: center;
-  opacity: 0.75;
-  margin: 0;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* ── ZONA MEDIA: Botones de navegación ───────────────────── */
@@ -184,6 +188,14 @@
 /* ================================================================
    ÁREA MAIN — Contenido de bienvenida
    ================================================================ */
+/* Área de contenido general para el Layout wrapper */
+.layout-content-area {
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--color-white);
+  height: 100vh;
+}
+
 .layout-main {
   flex: 1;                    /* Ocupa todo el ancho restante */
   overflow-y: auto;
@@ -193,6 +205,7 @@
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
+  min-height: 100%;
 }
 
 /* Emoji grande de bienvenida */
