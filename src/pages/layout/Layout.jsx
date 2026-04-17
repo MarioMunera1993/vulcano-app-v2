@@ -4,8 +4,8 @@
 // Página principal a la que llega el usuario después del login
 // exitoso. Tiene tres zonas en el sidebar izquierdo:
 //
-//   ZONA SUPERIOR → Foto de perfil + nombre + username
-//   ZONA MEDIA    → Botón "Cursos" (navega a /Course)
+//   ZONA SUPERIOR → Foto de perfil + nombre
+//   ZONA MEDIA    → Navegación entre páginas
 //   ZONA INFERIOR → "Modificar Perfil" y "Cerrar sesión"
 //
 // Los datos del usuario se leen de localStorage.
@@ -14,25 +14,19 @@
 // ============================================================
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import "../../styles/Layout.css";
 import EditProfileModal from "../../components/EditProfileModal";
 import { getUserById } from "../../services/api";
 
-const Layout = ({ children }) => {
+const Layout = () => {
   const navigate = useNavigate();
 
-  // ----------------------------------------------------------
-  // PASO 1: Estado para los datos del usuario
-  // ----------------------------------------------------------
   const [user, setUser] = useState(() => {
     const userRaw = localStorage.getItem("user");
     return userRaw ? JSON.parse(userRaw) : null;
   });
 
-  // ----------------------------------------------------------
-  // PASO 2: useEffect para leer de la base de datos (BD)
-  // ----------------------------------------------------------
   useEffect(() => {
     if (user && user.id) {
       getUserById(user.id)
@@ -46,31 +40,21 @@ const Layout = ({ children }) => {
     } else {
       navigate("/Login");
     }
-  }, []);
+  }, [navigate, user]);
 
-  // Extraemos los datos del perfil con valores por defecto (fallbacks)
-  const firstName  = user?.profile?.firstName       || "Usuario";
-  const lastName   = user?.profile?.lastName        || "";
-  // Traducimos el rol de inglés (BD) a español (Display)
+  const firstName = user?.profile?.firstName || "Usuario";
+  const lastName = user?.profile?.lastName || "";
   const roleDisplay = user?.role === "ADMIN" ? "ADMINISTRADOR" : "USUARIO";
   const profilePic = user?.profile?.profilePictureUrl || null;
 
-  // ----------------------------------------------------------
-  // PASO 3: Estado para mostrar/ocultar el modal de edición
-  // ----------------------------------------------------------
   const [showEditModal, setShowEditModal] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // ----------------------------------------------------------
-  // handleLogout: Limpia la sesión y redirige al Login
-  // ----------------------------------------------------------
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/Login");
   };
 
-  // ----------------------------------------------------------
-  // handleProfileUpdated: Callback que llama el modal al guardar
-  // ----------------------------------------------------------
   const handleProfileUpdated = (updatedUser) => {
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -78,14 +62,9 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="layout-container">
-      <aside className="layout-sidebar">
-        <div 
-          className="sidebar-profile" 
-          onClick={() => navigate("/Dashboard")}
-          style={{ cursor: "pointer" }}
-          title="Ir al Inicio"
-        >
+    <div className={`layout-container ${isSidebarOpen ? "" : "sidebar-collapsed"}`}>
+      <aside className={`layout-sidebar ${isSidebarOpen ? "open" : "closed"}`}>
+        <div className="sidebar-profile">
           {profilePic ? (
             <img
               src={profilePic}
@@ -95,6 +74,7 @@ const Layout = ({ children }) => {
           ) : (
             <div className="sidebar-avatar-placeholder">👤</div>
           )}
+
           <p className="sidebar-name">{firstName} {lastName}</p>
           <p className="sidebar-role">{roleDisplay}</p>
         </div>
@@ -102,10 +82,10 @@ const Layout = ({ children }) => {
         <nav className="sidebar-nav">
           <button
             className="sidebar-nav-btn"
-            onClick={() => navigate("/Dashboard")}
+            onClick={() => navigate("/layout")}
           >
             <span className="btn-icon">🏠</span>
-            Inicio
+            <span className="sidebar-text">Inicio</span>
           </button>
 
           <button
@@ -113,17 +93,40 @@ const Layout = ({ children }) => {
             onClick={() => navigate("/Course")}
           >
             <span className="btn-icon">📚</span>
-            Cursos
+            <span className="sidebar-text">Cursos</span>
           </button>
 
-          {/* Opción solo para Administradores */}
+          <button
+            className="sidebar-nav-btn"
+            onClick={() => navigate("/ModuleView")}
+          >
+            <span className="btn-icon">🎓</span>
+            <span className="sidebar-text">Módulos</span>
+          </button>
+
+          <button
+            className="sidebar-nav-btn"
+            onClick={() => navigate("/layout/agendar")}
+          >
+            <span className="btn-icon">📅</span>
+            <span className="sidebar-text">Agendar Clases</span>
+          </button>
+
+          <button
+            className="sidebar-nav-btn"
+            onClick={() => navigate("/Review")}
+          >
+            <span className="btn-icon">💬</span>
+            <span className="sidebar-text">Opiniones</span>
+          </button>
+
           {user?.role === "ADMIN" && (
             <button
               className="sidebar-nav-btn"
               onClick={() => navigate("/Users")}
             >
               <span className="btn-icon">👥</span>
-              Usuarios
+              <span className="sidebar-text">Usuarios</span>
             </button>
           )}
         </nav>
@@ -133,22 +136,30 @@ const Layout = ({ children }) => {
             className="sidebar-footer-btn"
             onClick={() => setShowEditModal(true)}
           >
-            <span>✏️</span>
-            Modificar Perfil
+            <span className="btn-icon">✏️</span>
+            <span className="sidebar-text">Modificar Perfil</span>
           </button>
 
           <button
             className="sidebar-footer-btn danger"
             onClick={handleLogout}
           >
-            <span>🚪</span>
-            Cerrar sesión
+            <span className="btn-icon">🚪</span>
+            <span className="sidebar-text">Cerrar sesión</span>
           </button>
         </div>
       </aside>
 
-      <main className="layout-content-area">
-        {children}
+      <main className="layout-main">
+        <button
+          className="sidebar-toggle-btn"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          title={isSidebarOpen ? "Ocultar menú" : "Mostrar menú"}
+        >
+          {isSidebarOpen ? "◀" : "☰"}
+        </button>
+
+        <Outlet />
       </main>
 
       {showEditModal && user && (
