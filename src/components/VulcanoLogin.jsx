@@ -145,7 +145,7 @@ const VulcanoLogin = () => {
 
         <div className="login-footer-text" style={{ marginTop: "16px" }}>
           ¿No tienes cuenta?{" "}
-          <Link to="/Register" style={{ color: "#D3ABB0", fontWeight: 800, textDecoration: "none" }}>
+          <Link to="/register" style={{ color: "#D3ABB0", fontWeight: 800, textDecoration: "none" }}>
             Regístrate aquí
           </Link>
         </div>

@@ -1,21 +1,35 @@
 import Swal from "sweetalert2";
 
+// ----------------------------------------------------------
+// redirectAlert
+// ----------------------------------------------------------
+// Muestra un mensaje con cuenta regresiva y luego redirige
+// al usuario a la URL indicada.
+//
+// Tarea 17: el parámetro "url" antes se recibía pero nunca
+// se usaba. Ahora redirige correctamente al cerrar el modal.
+// ----------------------------------------------------------
 export const redirectAlert = (title, message, url, icon, timer) => {
     let timerInterval;
     Swal.fire({
         title,
         html: message + "<p></p>",
+        icon,
         timer,
         timerProgressBar: true,
         didOpen: () => {
             Swal.showLoading();
-            const timer = Swal.getPopup().querySelector("p");
+            const timerEl = Swal.getPopup().querySelector("p");
             timerInterval = setInterval(() => {
-                timer.textContent = `${Swal.getTimerLeft()}`;
+                timerEl.textContent = `${Swal.getTimerLeft()}`;
             }, 100);
         },
         willClose: () => {
             clearInterval(timerInterval);
+            // Redirigir a la URL indicada al cerrar el modal
+            if (url) {
+                window.location.href = url;
+            }
         }
     });
 }

@@ -28,20 +28,26 @@ const Layout = ({ children }) => {
     return userRaw ? JSON.parse(userRaw) : null;
   });
 
+  // ----------------------------------------------------------
+  // CORRECCIÓN: usamos solo user?.id como dependencia.
+  // Antes usábamos el objeto "user" completo → cada vez que
+  // setUser() actualizaba el objeto, el efecto se volvía a
+  // disparar, creando un loop infinito de llamadas al backend.
+  // ----------------------------------------------------------
   useEffect(() => {
-    if (user && user.id) {
-      getUserById(user.id)
-        .then((freshUser) => {
-          setUser(freshUser);
-          localStorage.setItem("user", JSON.stringify(freshUser));
-        })
-        .catch((err) => {
-          console.error("Error al sincronizar con la BD:", err);
-        });
-    } else {
-      navigate("/Login");
+    if (!user?.id) {
+      navigate("/login");
+      return;
     }
-  }, [navigate, user]);
+    getUserById(user.id)
+      .then((freshUser) => {
+        setUser(freshUser);
+        localStorage.setItem("user", JSON.stringify(freshUser));
+      })
+      .catch((err) => {
+        console.error("Error al sincronizar con la BD:", err);
+      });
+  }, [user?.id, navigate]);
 
   const firstName = user?.profile?.firstName || "Usuario";
   const lastName = user?.profile?.lastName || "";
@@ -91,7 +97,7 @@ const Layout = ({ children }) => {
 
           <button
             className="sidebar-nav-btn"
-            onClick={() => navigate("/layout/Course")}
+            onClick={() => navigate("/layout/course")}
           >
             <span className="btn-icon">📚</span>
             <span className="sidebar-text">Cursos</span>
@@ -99,7 +105,7 @@ const Layout = ({ children }) => {
 
           <button
             className="sidebar-nav-btn"
-            onClick={() => navigate("/layout/ModuleView")}
+            onClick={() => navigate("/layout/module-view")}
           >
             <span className="btn-icon">🎓</span>
             <span className="sidebar-text">Módulos</span>
@@ -117,7 +123,7 @@ const Layout = ({ children }) => {
           
           <button
             className="sidebar-nav-btn"
-            onClick={() => navigate("/layout/Review")}
+            onClick={() => navigate("/layout/review")}
           >
             <span className="btn-icon">💬</span>
             <span className="sidebar-text">Opiniones</span>
@@ -127,7 +133,7 @@ const Layout = ({ children }) => {
           {user?.role === "ADMIN" && (
             <button
               className="sidebar-nav-btn"
-              onClick={() => navigate("/Users")}
+              onClick={() => navigate("/layout/users")}
             >
               <span className="btn-icon">👥</span>
               <span className="sidebar-text">Usuarios</span>
@@ -171,7 +177,8 @@ const Layout = ({ children }) => {
           {isSidebarOpen ? "◀" : "☰"}
         </button>
 
-        {children || <Outlet context={{ setShowEditModal, firstName }} />}
+        {/* Outlet renderiza el componente hijo activo según la ruta */}
+        <Outlet context={{ setShowEditModal, firstName }} />
       </main>
 
       {showEditModal && user && (

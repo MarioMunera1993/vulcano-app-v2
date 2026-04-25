@@ -1,5 +1,5 @@
 /**
- * SERVICIO DE HORARIOS (Schedule API Service - Refactored for specific API)
+ * SERVICIO DE HORARIOS (Schedule API Service)
  * Este archivo centraliza las peticiones CRUD para las clases/horarios.
  */
 
@@ -17,7 +17,7 @@ export const getAllSchedules = async () => {
 
 /**
  * Obtiene horarios disponibles de un profesor/experto (PARA LOS ALUMNOS).
- * @param {number|string} expertId 
+ * @param {number|string} expertId
  * @returns {Promise<Array>}
  */
 export const getAvailableSchedules = async (expertId) => {
@@ -27,8 +27,8 @@ export const getAvailableSchedules = async (expertId) => {
 };
 
 /**
- * Obtiene clases de un estudiante específico (Ya agendadas).
- * @param {number|string} studentId 
+ * Obtiene clases de un estudiante específico (ya agendadas).
+ * @param {number|string} studentId
  * @returns {Promise<Array>}
  */
 export const getSchedulesByStudent = async (studentId) => {
@@ -37,34 +37,53 @@ export const getSchedulesByStudent = async (studentId) => {
     return await response.json();
 };
 
+// ----------------------------------------------------------
+// Tarea 13: se separó la función createSchedule (que antes
+// cambiaba de comportamiento según cuántos argumentos recibía)
+// en DOS funciones con nombres claros y responsabilidad única.
+//
+// ANTES: createSchedule(arg1, arg2) — confuso
+// AHORA: createAvailability(formData) — para el docente
+//        bookSchedule(studentId, data) — para el alumno
+// ----------------------------------------------------------
+
 /**
- * Crea una nueva clase vinculada a un estudiante (BOOKING).
- * Mantiene compatibilidad con el sistema anterior si se pasan 2 argumentos.
+ * [DOCENTE] Crea un nuevo bloque de disponibilidad (horario disponible).
+ * Lo usa el docente/admin para publicar sus horas disponibles.
+ * @param {Object} formData - Datos del horario a crear
+ * @returns {Promise<Object>}
  */
-export const createSchedule = async (arg1, arg2) => {
-    // Si se pasan dos argumentos, es el booking de un alumno: createSchedule(studentId, data)
-    // Si se pasa uno, es la creación de una disponibilidad maestra: createSchedule(formData)
-    let url = API_BASE_URL;
-    let body = arg1;
-
-    if (arg2) {
-        url = `${API_BASE_URL}/student/${arg1}`;
-        body = arg2;
-    }
-
-    const response = await fetch(url, {
+export const createAvailability = async (formData) => {
+    const response = await fetch(API_BASE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify(formData)
     });
-    if (!response.ok) throw new Error("Error al crear la clase/horario");
+    if (!response.ok) throw new Error("Error al crear la disponibilidad");
+    return await response.json();
+};
+
+/**
+ * [ALUMNO] Reserva (agenda) una clase para un estudiante específico.
+ * Lo usa el alumno para agendar una clase con un docente.
+ * @param {number} studentId - ID del estudiante que agenda
+ * @param {Object} scheduleData - Datos de la clase a agendar
+ * @returns {Promise<Object>}
+ */
+export const bookSchedule = async (studentId, scheduleData) => {
+    const response = await fetch(`${API_BASE_URL}/student/${studentId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(scheduleData)
+    });
+    if (!response.ok) throw new Error("Error al agendar la clase");
     return await response.json();
 };
 
 /**
  * Actualiza una clase existente.
- * @param {number} id 
- * @param {Object} scheduleData 
+ * @param {number} id
+ * @param {Object} scheduleData
  */
 export const updateSchedule = async (id, scheduleData) => {
     const response = await fetch(`${API_BASE_URL}/${id}`, {
@@ -72,19 +91,18 @@ export const updateSchedule = async (id, scheduleData) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(scheduleData)
     });
-    if (!response.ok) throw new Error("Error al actualizar");
+    if (!response.ok) throw new Error("Error al actualizar el horario");
     return await response.json();
 };
 
 /**
  * Elimina una clase/registro por ID.
- * @param {number} id 
+ * @param {number} id
  */
 export const deleteSchedule = async (id) => {
     const response = await fetch(`${API_BASE_URL}/${id}`, {
         method: "DELETE"
     });
-    if (!response.ok) throw new Error("Error al eliminar");
+    if (!response.ok) throw new Error("Error al eliminar el horario");
     return true;
 };
-

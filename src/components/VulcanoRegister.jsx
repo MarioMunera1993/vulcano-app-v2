@@ -111,7 +111,7 @@ const VulcanoRegister = () => {
         background: "#fff4e2",
         color: "#472825"
       });
-      setTimeout(() => navigate("/Login"), 2000);
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       Swal.fire({
         title: "Error al registrar",

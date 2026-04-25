@@ -7,12 +7,12 @@ import { Page404 } from "../pages/Page404";
 import ModuleView from "../pages/ModuleView";
 import CoursePage from "../pages/CoursePage";
 import UserManagement from "../pages/UserManagement";
-import Dashboard from "../pages/Dashboard";
 import Layout from "../pages/layout/Layout";
 import DashboardHome from "../pages/layout/DashboardHome";
 import ClassScheduling from "../components/ClassScheduling";
 import ClassManagement from "../components/ClassManagement";
 import TeacherForm from "../components/TeacherForm";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
     {
@@ -20,27 +20,31 @@ const router = createBrowserRouter([
         element: <VulcanHome />,
     },
     {
-        path: "/Login",
+        // Ruta pública: cualquiera puede acceder
+        path: "/login",
         element: <VulcanoLogin />,
     },
     {
-        path: "/Register",
+        // Ruta pública: cualquiera puede acceder
+        path: "/register",
         element: <VulcanoRegister />,
     },
     {
+        // Ruta PROTEGIDA: solo usuarios con sesión activa
+        // PrivateRoute verifica el localStorage antes de mostrar Layout
         path: "/layout",
-        element: <Layout />,
+        element: <PrivateRoute><Layout /></PrivateRoute>,
         children: [
             {
                 index: true,
                 element: <DashboardHome />,
             },
             {
-                path: "Course",
+                path: "course",
                 element: <CoursePage />,
             },
             {
-                path: "ModuleView",
+                path: "module-view",
                 element: <ModuleView />,
             },
             {
@@ -56,11 +60,11 @@ const router = createBrowserRouter([
                 element: <TeacherForm />,
             },
             {
-                path: "Review",
+                path: "review",
                 element: <Review />,
             },
             {
-                path: "Users",
+                path: "users",
                 element: <UserManagement />,
             }
         ],

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getUserById } from "../services/api";
 import { 
   getAllSchedules, 
-  createSchedule, 
+  createAvailability,
   updateSchedule, 
   deleteSchedule 
 } from "../services/scheduleService";
@@ -204,7 +204,8 @@ const ClassManagement = () => {
       if (editId) {
         await updateSchedule(editId, payload);
       } else {
-        await createSchedule(payload);
+        // createAvailability crea una nueva clase (antes era createSchedule)
+        await createAvailability(payload);
       }
       
       Swal.fire({
