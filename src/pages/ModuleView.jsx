@@ -1,6 +1,8 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import NavbarPpal from '../components/NavbarPpal';
 import VulcanoFooter from '../components/VulcanoFooter';
+import Swal from 'sweetalert2';
 import ModuleCard from '../components/ModuleCard';
 import ModuleForm from '../components/ModuleForm';
 import { getModules, createModule, updateModule, deleteModule } from '../services/moduleService';
@@ -16,6 +18,22 @@ const ModuleView = () => {
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [saving, setSaving] = useState(false);
+
+  /* ---- Toast con Swal ---- */
+  const showToast = (msg, icon = 'success') => {
+    Swal.fire({
+      text: msg,
+      icon: icon,
+      toast: true,
+      position: 'bottom-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      background: "#fff4e2",
+      color: "#472825"
+    });
+  };
+
 
   /* ---- Carga de datos ---- */
   const load = useCallback(() => {
@@ -136,9 +154,7 @@ const ModuleView = () => {
   const totalMinutes = modules.reduce((sum, m) => sum + (Number(m.durationInMinutes) || 0), 0);
 
   return (
-    <div className="vh-container">
-      <NavbarPpal />
-
+    <div className="w-full">
       <main className="mv-page">
         {/* ---- Hero con mascota ---- */}
         <div className="mv-hero">
@@ -290,7 +306,10 @@ const ModuleView = () => {
         </div>
       )}
 
+ 
       <VulcanoFooter />
+
+
     </div>
   );
 };
